@@ -1,4 +1,5 @@
-from app import db
+# models.py
+from app import db  # app.py에서 db 객체를 가져옴
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,7 +11,7 @@ class Employee(db.Model):
 
 class TrainingType(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)  # 교육 종류
+    name = db.Column(db.String(50), nullable=False)
 
 class TrainingCompletion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
