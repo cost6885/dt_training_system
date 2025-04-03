@@ -16,7 +16,9 @@ CORS(app)
 db = SQLAlchemy(app)
 
 # 모델 임포트
-from models import Employee, Task, TrainingCompletion, TrainingType
+def create_app():
+    from models import Employee, Task, TrainingCompletion, TrainingType
+    # 나머지 코드...
 
 @app.route('/')
 def index():
