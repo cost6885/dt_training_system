@@ -1,30 +1,30 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 import os
 
 app = Flask(__name__)
 
-# 데이터베이스 URI 설정 (SQLite로 설정)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///employee_training.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # SQLAlchemy의 변경 추적을 끔
+# PostgreSQL URI 설정 (환경 변수나 직접 설정)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dt:dt_password@localhost/mydatabase'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# CORS 설정 (프론트엔드와의 크로스 도메인 요청을 허용)
-CORS(app)
-
-# 데이터베이스 객체 생성
+# SQLAlchemy 객체 생성
 db = SQLAlchemy(app)
 
-# 모델 임포트
-from models import Employee, Task, TrainingCompletion, TrainingType
+# 예시 모델 (PostgreSQL 데이터베이스에 테이블을 생성하고 사용할 수 있습니다)
+class Employee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    position = db.Column(db.String(100))
+    salary = db.Column(db.Float)
 
-# 테이블 생성 (이 작업은 앱을 처음 실행할 때만 필요)
-with app.app_context():
-    db.create_all()  # 테이블 생성
-
+# 기본 라우트
 @app.route('/')
 def index():
-    return 'Welcome to the DT Training System!'
+    return "Connected to the PostgreSQL database!"
 
 if __name__ == '__main__':
+    # 데이터베이스 연결을 확인하고, 테이블을 생성할 수 있습니다.
+    with app.app_context():
+        db.create_all()  # 테이블 생성
     app.run(debug=True)
