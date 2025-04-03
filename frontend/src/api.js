@@ -1,18 +1,20 @@
 // api.js
 export const getTrainingData = async () => {
-  const response = await fetch('http://15.164.228.135:5000/api/trainings');  // API URL
+  const response = await fetch('http://15.164.228.135:5000/api/trainings');
   const data = await response.json();
 
-  console.log(data); // 데이터 형식을 확인
+  // 로그로 데이터 확인
+  console.log(data);  // 데이터 형식 확인
 
-  return data;  // 이 데이터를 배열로 반환해야 합니다.
+  return Array.isArray(data) ? data : [];  // 배열로 변환해서 반환
 };
 
 export const getTaskData = async () => {
-  const response = await fetch('http://15.164.228.135:5000/api/tasks');  // API URL
+  const response = await fetch('http://15.164.228.135:5000/api/tasks');
   const data = await response.json();
 
-  console.log(data); // 데이터 형식을 확인
+  // 로그로 데이터 확인
+  console.log(data);  // 데이터 형식 확인
 
-  return data;  // 이 데이터를 배열로 반환해야 합니다.
+  return Array.isArray(data) ? data : [];  // 배열로 변환해서 반환
 };
