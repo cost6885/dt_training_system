@@ -68,9 +68,10 @@ def add_employee():
     db.session.commit()
     return jsonify({'message': 'Employee added successfully!'}), 201
 
-@app.before_first_request
+@app.before_request
 def initialize_data():
-    insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
+    if Employee.query.count() == 0:
+        insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
 
 # 기본 라우트
 @app.route('/')
