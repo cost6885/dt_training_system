@@ -18,6 +18,18 @@ class Employee(db.Model):
     position = db.Column(db.String(100))
     salary = db.Column(db.Float)
 
+@app.route('/add_employee', methods=['POST'])
+def add_employee():
+    data = request.get_json()  # JSON 형태로 데이터 받기
+    new_employee = Employee(
+        name=data['name'], 
+        position=data['position'], 
+        salary=data['salary']
+    )
+    db.session.add(new_employee)
+    db.session.commit()
+    return jsonify({'message': 'Employee added successfully!'}), 201
+
 # 기본 라우트
 @app.route('/')
 def index():
