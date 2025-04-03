@@ -75,6 +75,26 @@ def initialize_data():
     if Employee.query.count() == 0:
         insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
 
+
+# API 엔드포인트: /api/trainings (데이터베이스에서 실제 훈련 데이터를 가져오기)
+@app.route('/api/trainings')
+def get_trainings():
+    # 실제로 데이터베이스에서 훈련 데이터를 가져옵니다
+    trainings = Employee.query.all()  # 모든 직원 정보를 가져오는 예시
+    training_data = [{'name': employee.name, 'status': '완료'} for employee in trainings]  # 예시로 status를 '완료'로 설정
+    return jsonify(training_data)
+
+# API 엔드포인트: /api/tasks (데이터베이스에서 실제 과제 데이터를 가져오기)
+@app.route('/api/tasks')
+def get_tasks():
+    # 실제로 데이터베이스에서 과제 데이터를 가져옵니다
+    tasks = Employee.query.all()  # 예시로 직원 데이터를 가져옴
+    task_data = [{'task_name': employee.name, 'priority': 'High'} for employee in tasks]  # 예시로 priority를 'High'로 설정
+    return jsonify(task_data)
+
+
+
+
 # 기본 라우트
 @app.route('/')
 def index():
