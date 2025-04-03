@@ -2,12 +2,15 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 from flask_cors import CORS  # CORS 추가
+from dotenv import load_dotenv
+
+load_dotenv()  # .env 파일에서 환경 변수 로드
 
 app = Flask(__name__)
 CORS(app)  # 모든 도메인에서의 접근을 허용
 
-# PostgreSQL URI 설정 (환경 변수나 직접 설정)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dt:dt_password@localhost/mydatabase'
+# PostgreSQL URI 설정 (환경 변수 사용)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # SQLAlchemy 객체 생성
@@ -64,11 +67,12 @@ def add_employee():
     new_employee = Employee(
         name=data['name'], 
         position=data['position'], 
-        salary=data.get('salary')  # 'salary' 필드를 optional하게 받기 (없으면 None으로 처리)
+        salary=data.get('salary', None)  # 'salary'가 없으면 None으로 처리
     )
     db.session.add(new_employee)
     db.session.commit()
     return jsonify({'message': 'Employee added successfully!'}), 201
+
 
 @app.before_request
 def initialize_data():
