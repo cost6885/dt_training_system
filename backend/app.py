@@ -15,8 +15,8 @@ CORS(app)
 # 데이터베이스 설정
 db = SQLAlchemy(app)
 
-# 모델 임포트
-from models import Employee, Task, TrainingCompletion, TrainingType    
+# 모델 임포트 (이제 모델을 여기서만 임포트)
+from models import Employee, Task, TrainingCompletion, TrainingType
 
 @app.route('/')
 def index():
