@@ -1,12 +1,14 @@
-import React from 'react';  // React를 불러옵니다.
-import ReactDOM from 'react-dom';  // ReactDOM을 불러옵니다.
-import App from './App';  // App 컴포넌트를 불러옵니다.
-import './index.css';  // 전역 스타일을 불러옵니다.
+// src/index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';  // App 컴포넌트
+import './index.css';     // 스타일 파일
 
-// React 앱을 'root' div에 렌더링합니다.
-ReactDOM.render(
+const rootElement = document.getElementById('root');
+const root = ReactDOM.createRoot(rootElement);
+
+root.render(
   <React.StrictMode>
-    <App />  {/* App 컴포넌트를 렌더링 */}
-  </React.StrictMode>,
-  document.getElementById('root')  // 'index.html'에 있는 'root' div에 렌더링
+    <App />
+  </React.StrictMode>
 );
