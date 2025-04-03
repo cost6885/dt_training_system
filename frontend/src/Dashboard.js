@@ -1,18 +1,22 @@
+// Dashboard.js
 import React, { useState, useEffect } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
-import { getTrainingData, getTaskData } from './api'; // 데이터 가져오는 함수
+import { getTrainingData, getTaskData } from './api';
 
 function Dashboard() {
   const [trainings, setTrainings] = useState([]);
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    // 데이터 API 호출 후, 상태 업데이트
     getTrainingData().then(setTrainings);
     getTaskData().then(setTasks);
   }, []);
 
-  // 차트 데이터 생성
+  // 빈 데이터일 경우의 처리
+  if (trainings.length === 0 && tasks.length === 0) {
+    return <div>No data available</div>;  // 데이터가 없을 때 메시지 출력
+  }
+
   const trainingChartData = {
     labels: Array.isArray(trainings) ? trainings.map(training => training.name) : [],
     datasets: [
