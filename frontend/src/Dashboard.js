@@ -1,20 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
-import { getTrainingData, getTaskData } from './api';
 
 function Dashboard() {
   const [trainings, setTrainings] = useState([]);
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    getTrainingData().then(data => {
-      console.log('Trainings Data:', data);  // 데이터 확인
-      setTrainings(data);  // 상태에 데이터 설정
-    });
-    getTaskData().then(data => {
-      console.log('Tasks Data:', data);  // 데이터 확인
-      setTasks(data);  // 상태에 데이터 설정
-    });
+    // 교육 데이터 API 호출
+    fetch('http://15.164.228.135:5000/api/trainings')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Training Data:', data);  // 콘솔에 데이터 확인
+        setTrainings(data);  // 상태에 데이터 저장
+      })
+      .catch(error => {
+        console.error('Training data fetch error:', error);  // 오류 확인
+      });
+
+    // 과제 데이터 API 호출
+    fetch('http://15.164.228.135:5000/api/tasks')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Task Data:', data);  // 콘솔에 데이터 확인
+        setTasks(data);  // 상태에 데이터 저장
+      })
+      .catch(error => {
+        console.error('Task data fetch error:', error);  // 오류 확인
+      });
   }, []);  // 빈 배열을 넣으면 컴포넌트 마운트 시 한 번만 실행됨
 
   const trainingChartData = {
