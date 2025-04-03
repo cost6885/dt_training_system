@@ -24,7 +24,8 @@ def index():
     return "Connected to the PostgreSQL database!"
 
 if __name__ == '__main__':
+
     # 데이터베이스 연결을 확인하고, 테이블을 생성할 수 있습니다.
     with app.app_context():
         db.create_all()  # 테이블 생성
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
