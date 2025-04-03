@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
+from flask_cors import CORS  # CORS 추가
 
 app = Flask(__name__)
+CORS(app)  # 모든 도메인에서의 접근을 허용
 
 # PostgreSQL URI 설정 (환경 변수나 직접 설정)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dt:dt_password@localhost/mydatabase'
