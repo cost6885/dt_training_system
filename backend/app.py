@@ -63,7 +63,7 @@ def insert_initial_data():
         employees.extend(new_employees)
         save_employees(employees)
 
-@app.before_first_request
+@app.before_request
 def initialize_data():
     insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
 
