@@ -1,30 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-} from 'chart.js';
-
-// 필요한 Chart.js 요소들을 등록합니다.
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
 
 function Dashboard() {
   const [trainings, setTrainings] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
     // 교육 데이터 API 호출
@@ -48,8 +28,20 @@ function Dashboard() {
       .catch(error => {
         console.error('Task data fetch error:', error);  // 오류 확인
       });
-  }, []);  // 빈 배열을 넣으면 컴포넌트 마운트 시 한 번만 실행됨
 
+    // 직원 데이터 API 호출
+    fetch('http://3.34.97.222:5000/api/employees')  // 추가된 직원 데이터 API 호출
+      .then(response => response.json())
+      .then(data => {
+        console.log('Employee Data:', data);  // 콘솔에 데이터 확인
+        setEmployees(data);  // 상태에 직원 데이터 저장
+      })
+      .catch(error => {
+        console.error('Employee data fetch error:', error);  // 오류 확인
+      });
+  }, []);
+
+  // 차트 데이터 생성
   const trainingChartData = {
     labels: trainings.map(training => training.name),
     datasets: [
@@ -83,6 +75,16 @@ function Dashboard() {
 
       <h2>과제 우선순위</h2>
       <Pie data={taskPriorityData} />
+
+      {/* 직원 목록 출력 */}
+      <h2>직원 목록</h2>
+      <ul>
+        {employees.map((employee, index) => (
+          <li key={index}>
+            {employee.name} - {employee.position} - {employee.salary}원
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
