@@ -1,6 +1,6 @@
 const getTrainingData = async () => {
   try {
-    const response = await fetch('http://15.164.228.135:5000/api/trainings');
+    const response = await fetch('http://3.34.97.222:5000/api/trainings'); // ip 변경
     const data = await response.json();
     console.log('Training Data:', data);  // API 응답 데이터 출력
     return Array.isArray(data) ? data : [];
@@ -12,7 +12,7 @@ const getTrainingData = async () => {
 
 const getTaskData = async () => {
   try {
-    const response = await fetch('http://15.164.228.135:5000/api/tasks');
+    const response = await fetch('http://3.34.97.222:5000/api/tasks'); // ip변경
     const data = await response.json();
     console.log('Task Data:', data);  // API 응답 데이터 출력
     return Array.isArray(data) ? data : [];
