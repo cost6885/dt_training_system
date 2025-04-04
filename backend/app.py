@@ -84,6 +84,11 @@ def add_employee():
         return jsonify({'error': str(e)}), 500
 
 
+# 직원 목록 API 엔드포인트
+@app.route('/api/employees', methods=['GET'])
+def get_employees():
+    employees = load_employees()  # 파일에서 직원 데이터 로드
+    return jsonify(employees)
 
 
 # API 엔드포인트: /api/trainings (예시)
