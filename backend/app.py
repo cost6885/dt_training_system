@@ -1,10 +1,12 @@
-import json
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # CORS 추가
+import json
 import os
 
 app = Flask(__name__)
+CORS(app)  # 모든 도메인에서의 접근을 허용
 
-# 파일 경로
+# 데이터 파일 경로
 DATA_FILE = 'employees.json'
 
 
@@ -43,6 +45,7 @@ class Employee:
             salary=data.get('salary', 0)  # 기본값 0 처리
         )
 
+
 # 초기 데이터 삽입
 def insert_initial_data():
     employees = load_employees()
@@ -63,6 +66,7 @@ def insert_initial_data():
         employees.extend(new_employees)
         save_employees(employees)
 
+
 @app.before_request
 def initialize_data():
     insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
@@ -82,13 +86,6 @@ def add_employee():
         return jsonify({'error': 'Invalid data. "name" and "position" are required.'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-# 직원 목록 API 엔드포인트
-@app.route('/api/employees', methods=['GET'])
-def get_employees():
-    employees = load_employees()  # 파일에서 직원 데이터 로드
-    return jsonify(employees)
 
 
 # API 엔드포인트: /api/trainings (예시)
