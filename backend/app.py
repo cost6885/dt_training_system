@@ -1,112 +1,110 @@
+import json
 from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
 import os
-from flask_cors import CORS  # CORS 추가
-from dotenv import load_dotenv
-
-load_dotenv()  # .env 파일에서 환경 변수 로드
 
 app = Flask(__name__)
-CORS(app)  # 모든 도메인에서의 접근을 허용
 
-# PostgreSQL URI 설정 (환경 변수 사용)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# 파일 경로
+DATA_FILE = 'employees.json'
 
-# SQLAlchemy 객체 생성
-db = SQLAlchemy(app)
 
-# 예시 모델 (PostgreSQL 데이터베이스에 테이블을 생성하고 사용할 수 있습니다)
-class Employee(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    position = db.Column(db.String(100))
-    salary = db.Column(db.Float)  # salary 필드를 추가 (필요에 따라 제거 가능)
+# 직원 데이터 저장 및 불러오기 함수
+def load_employees():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r', encoding='utf-8') as file:
+            return json.load(file)
+    return []  # 데이터가 없으면 빈 리스트 반환
+
+
+def save_employees(employees):
+    with open(DATA_FILE, 'w', encoding='utf-8') as file:
+        json.dump(employees, file, ensure_ascii=False, indent=4)
+
+
+# 직원 모델
+class Employee:
+    def __init__(self, name, position, salary=None):
+        self.name = name
+        self.position = position
+        self.salary = salary
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'position': self.position,
+            'salary': self.salary
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            name=data['name'],
+            position=data['position'],
+            salary=data.get('salary')
+        )
+
 
 # 초기 데이터 삽입
 def insert_initial_data():
-    if Employee.query.count() == 0:  # 데이터가 없을 때만 삽입
-        employees = [
-            Employee(name="김상우", position="영업기획팀"),
-            Employee(name="서민표", position="안양지점"),
-            Employee(name="오민석", position="영업기획팀"),
-            Employee(name="이병찬", position="자사몰사업팀"),
-            Employee(name="전진", position="이커머스기획팀"),
-            Employee(name="정태양", position="상품유통기획팀"),
-            Employee(name="조시묵", position="강서지점"),
-            Employee(name="조정찬", position="영업지원팀"),
-            Employee(name="김관수", position="포장개발팀"),
-            Employee(name="박재한", position="식품안전연구팀"),
-            Employee(name="손병욱", position="기능식품개발팀"),
-            Employee(name="손지민", position="R&D기획팀"),
-            Employee(name="이윤형", position="식품안전팀"),
-            Employee(name="하만호", position="품질보증팀"),
-            Employee(name="김경순", position="글로벌마케팅TF팀"),
-            Employee(name="고재규", position="안성환경공무팀"),
-            Employee(name="곽래환", position="안성환경공무팀"),
-            Employee(name="권형우", position="구미품질관리팀"),
-            Employee(name="박성운", position="구미생산2팀"),
-            Employee(name="손준기", position="아산환경공무팀"),
-            Employee(name="이준", position="아산생산1팀"),
-            Employee(name="장진호", position="구미품질관리팀"),
-            Employee(name="조성휘", position="아산생산2팀"),
-            Employee(name="김병묵", position="SCM팀"),
-            Employee(name="박준식", position="구매1팀"),
-            Employee(name="박지혜", position="구매3팀"),
-            Employee(name="이원준", position="디지털전략팀"),
-            Employee(name="장동성", position="법무팀"),
-            Employee(name="홍지현", position="법무팀"),
-            Employee(name="임지수", position="성장전략팀")
+    employees = load_employees()
+    if len(employees) == 0:  # 데이터가 없을 때만 삽입
+        new_employees = [
+            Employee(name="김상우", position="영업기획팀").to_dict(),
+            Employee(name="서민표", position="안양지점").to_dict(),
+            Employee(name="오민석", position="영업기획팀").to_dict(),
+            Employee(name="이병찬", position="자사몰사업팀").to_dict(),
+            Employee(name="전진", position="이커머스기획팀").to_dict(),
+            Employee(name="정태양", position="상품유통기획팀").to_dict(),
+            Employee(name="조시묵", position="강서지점").to_dict(),
+            Employee(name="조정찬", position="영업지원팀").to_dict(),
+            Employee(name="김관수", position="포장개발팀").to_dict(),
+            Employee(name="박재한", position="식품안전연구팀").to_dict(),
+            # 추가 데이터...
         ]
-        db.session.add_all(employees)
-        db.session.commit()
+        employees.extend(new_employees)
+        save_employees(employees)
+
 
 @app.route('/add_employee', methods=['POST'])
 def add_employee():
     data = request.get_json()  # JSON 형태로 데이터 받기
-    new_employee = Employee(
-        name=data['name'], 
-        position=data['position'], 
-        salary=data.get('salary', None)  # 'salary'가 없으면 None으로 처리
-    )
-    db.session.add(new_employee)
-    db.session.commit()
+    new_employee = Employee(name=data['name'], position=data['position'], salary=data.get('salary'))
+    employees = load_employees()
+    employees.append(new_employee.to_dict())  # 새로운 직원 데이터 추가
+    save_employees(employees)  # 변경된 데이터 저장
     return jsonify({'message': 'Employee added successfully!'}), 201
 
 
-@app.before_request
+@app.before_first_request
 def initialize_data():
-    if Employee.query.count() == 0:
-        insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
+    insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
 
 
-# API 엔드포인트: /api/trainings (데이터베이스에서 실제 훈련 데이터를 가져오기)
+# API 엔드포인트: /api/trainings (예시)
 @app.route('/api/trainings')
 def get_trainings():
-    # 실제로 데이터베이스에서 훈련 데이터를 가져옵니다
-    trainings = Employee.query.all()  # 모든 직원 정보를 가져오는 예시
-    training_data = [{'name': employee.name, 'status': '완료'} for employee in trainings]  # 예시로 status를 '완료'로 설정
-    return jsonify(training_data)
+    # 예시 데이터, 실제로는 JSON에서 가져올 수 있음
+    return jsonify([
+        {'name': 'Training 1', 'status': '완료'},
+        {'name': 'Training 2', 'status': '진행 중'}
+    ])
 
-# API 엔드포인트: /api/tasks (데이터베이스에서 실제 과제 데이터를 가져오기)
+
+# API 엔드포인트: /api/tasks (예시)
 @app.route('/api/tasks')
 def get_tasks():
-    # 실제로 데이터베이스에서 과제 데이터를 가져옵니다
-    tasks = Employee.query.all()  # 예시로 직원 데이터를 가져옴
-    task_data = [{'task_name': employee.name, 'priority': 'High'} for employee in tasks]  # 예시로 priority를 'High'로 설정
-    return jsonify(task_data)
-
-
+    # 예시 데이터, 실제로는 JSON에서 가져올 수 있음
+    return jsonify([
+        {'task_name': 'Task 1', 'priority': 'High'},
+        {'task_name': 'Task 2', 'priority': 'Low'}
+    ])
 
 
 # 기본 라우트
 @app.route('/')
 def index():
-    return "Connected to the PostgreSQL database!"
+    return "Connected to the local file storage!"
+
 
 if __name__ == '__main__':
-
-    # 데이터베이스 연결을 확인하고, 테이블을 생성할 수 있습니다.
-    with app.app_context():
-        db.create_all()  # 테이블 생성
     app.run(host='0.0.0.0', port=5000, debug=True)
