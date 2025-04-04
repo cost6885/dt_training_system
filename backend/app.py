@@ -26,7 +26,7 @@ class Employee:
     def __init__(self, name, position, salary=None):
         self.name = name
         self.position = position
-        self.salary = salary
+        self.salary = salary if salary else 0  # 기본 salary를 0으로 설정 (옵션)
 
     def to_dict(self):
         return {
@@ -40,9 +40,8 @@ class Employee:
         return cls(
             name=data['name'],
             position=data['position'],
-            salary=data.get('salary')
+            salary=data.get('salary', 0)  # 기본값 0 처리
         )
-
 
 # 초기 데이터 삽입
 def insert_initial_data():
@@ -64,20 +63,27 @@ def insert_initial_data():
         employees.extend(new_employees)
         save_employees(employees)
 
-
-@app.route('/add_employee', methods=['POST'])
-def add_employee():
-    data = request.get_json()  # JSON 형태로 데이터 받기
-    new_employee = Employee(name=data['name'], position=data['position'], salary=data.get('salary'))
-    employees = load_employees()
-    employees.append(new_employee.to_dict())  # 새로운 직원 데이터 추가
-    save_employees(employees)  # 변경된 데이터 저장
-    return jsonify({'message': 'Employee added successfully!'}), 201
-
-
 @app.before_first_request
 def initialize_data():
     insert_initial_data()  # 앱 시작 시 초기 데이터 삽입
+
+
+# 직원 추가 API 엔드포인트
+@app.route('/add_employee', methods=['POST'])
+def add_employee():
+    data = request.get_json()  # JSON 형태로 데이터 받기
+    try:
+        new_employee = Employee(name=data['name'], position=data['position'], salary=data.get('salary'))
+        employees = load_employees()
+        employees.append(new_employee.to_dict())  # 새로운 직원 데이터 추가
+        save_employees(employees)  # 변경된 데이터 저장
+        return jsonify({'message': 'Employee added successfully!'}), 201
+    except KeyError:
+        return jsonify({'error': 'Invalid data. "name" and "position" are required.'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 
 
 # API 엔드포인트: /api/trainings (예시)
