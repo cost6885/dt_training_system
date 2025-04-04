@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, ArcElement, Tooltip, Legend } from 'chart.js';
+
+// 필요한 요소와 축을 등록
+ChartJS.register(
+  CategoryScale,
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 function Dashboard() {
   const [trainings, setTrainings] = useState([]);
@@ -41,7 +50,7 @@ function Dashboard() {
       });
   }, []);
 
-  // 차트 데이터 생성
+  // 교육 이수 현황 차트 데이터 생성
   const trainingChartData = {
     labels: trainings.map(training => training.name),
     datasets: [
@@ -55,6 +64,7 @@ function Dashboard() {
     ]
   };
 
+  // 과제 우선순위 차트 데이터 생성
   const taskPriorityData = {
     labels: tasks.map(task => task.task_name),
     datasets: [
@@ -70,20 +80,26 @@ function Dashboard() {
 
   return (
     <div>
+      {/* 교육 이수 현황 차트 */}
       <h2>교육 이수 현황</h2>
       <Bar data={trainingChartData} />
 
+      {/* 과제 우선순위 차트 */}
       <h2>과제 우선순위</h2>
       <Pie data={taskPriorityData} />
 
       {/* 직원 목록 출력 */}
       <h2>직원 목록</h2>
       <ul>
-        {employees.map((employee, index) => (
-          <li key={index}>
-            {employee.name} - {employee.position} - {employee.salary}원
-          </li>
-        ))}
+        {employees.length > 0 ? (
+          employees.map((employee, index) => (
+            <li key={index}>
+              {employee.name} - {employee.position} - {employee.salary}원
+            </li>
+          ))
+        ) : (
+          <p>직원 데이터가 없습니다.</p>
+        )}
       </ul>
     </div>
   );
