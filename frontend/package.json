@@ -34,5 +34,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://15.164.228.135:5000"
+  "proxy": "http://3.34.97.222:5000" #가변프록시
 }
